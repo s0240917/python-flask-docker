@@ -47,12 +47,17 @@ jobs:
         echo "Pushing image to ECR..."
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-    - name: deploy to cluster
-      uses: s0240917/python-flask-docker@master
+    - name: Setup kubeconfig
+      id: setup-kubeconfig
+      run: |
+        aws eks --region ap-south-1 update-kubeconfig --name my-app
+    
+    - name: Deploy k8s yaml
+      id: deploy-k8s-yaml
       env:
-        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA_STAGING }}
-        #ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        #ECR_REPOSITORY: my-app
-        #IMAGE_TAG: ${{ github.sha }}
-      with:
-        args: run cofee --image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        K8S_YAML_DIR: ./manifests 
+        IMAGE_NAME: ${{ steps.build-image.outputs.image }}
+      run: |
+        # Setup kustomize
+        cd $K8S_YAML_DIR
+        kubectl apply -f -
