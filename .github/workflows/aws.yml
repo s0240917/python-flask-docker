@@ -60,4 +60,4 @@ jobs:
       run: |
         # Setup kustomize
         cd $K8S_YAML_DIR
-        kubectl apply -f -
+        kubectl apply -f .
