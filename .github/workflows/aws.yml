@@ -50,7 +50,7 @@ jobs:
     - name: Setup kubeconfig
       id: setup-kubeconfig
       run: |
-        aws eks --region ap-south-1 update-kubeconfig --name my-app
+        aws eks --region ap-south-1 update-kubeconfig --name first-eks
     
     - name: Deploy k8s yaml
       id: deploy-k8s-yaml
